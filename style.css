@@ -1,0 +1,20 @@
+.header {
+
+.heading {
+    color: var(--primary);
+    font-family: var(--heading-font);
+    margin-top: 10px;
+}
+
+.main-content {
+    border: solid 2px;
+    /* margin: 0 auto; */
+}
+
+.result-wrapper {
+    border: solid 2px;
+}
+
+.result-wrap-style {
+    border: solid 2px;
+}
