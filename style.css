@@ -3,8 +3,8 @@
 }
 :root {
     --primary: black;
-    --secondary: slategray;
-    --container: lightgray;
+    --secondary: rgb(205, 219, 233);
+    --container: rgb(255, 255, 255);
     --background: ghostwhite;
     --heading-font: "Kumbh Sans", sans-serif;
     --text-font: "Montserrat", sans-serif;
@@ -36,14 +36,14 @@
     margin-top: 5px;
 }
 .search-wrap-style {
-    background-color: lightblue;
+    background-color: rgb(201, 226, 235);
 }
 .text-input {
     margin-bottom: 5px;
 }
 .current-style {
     text-align: center;
-    background-color: lightblue;
+    background-color: rgb(211, 230, 236);
     margin-bottom: 8px;
     border-radius: 5px;
 }
@@ -72,7 +72,7 @@
 .forecast-class {
     display: flex;
     justify-content: space-between;
-    background-color: lightblue;
+    background-color: rgb(221, 240, 247);
 }
 .forecast-icon {
     width: 75px;
@@ -99,9 +99,9 @@
         font-size: 1.25rem;
     }
 }
-@media screen and (max-width: 768px) {
+/* @media screen and (max-width: 768px) {
     .content-wrapper {
         flex-direction: column;
         align-items: center;
     }
-}
+} */
