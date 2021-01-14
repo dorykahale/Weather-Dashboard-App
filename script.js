@@ -85,6 +85,37 @@ var weatherRequest = function (city) {
         .then(function (forecastResponse) {
             return forecastResponse.json();
         })
+        .then(function (forecastResponse) {
+            // for loop to display 5 day forecast
+            for (var i = 1; i < 6; i++) {
+                var forecastEl = document.createElement("div");
+                forecastEl.classList = "forecast-card card-body rounded-lg border-dark bg-info text-light";
+                forecastContainer.appendChild(forecastEl);
+
+                // display date 
+                var dateDiv = document.createElement("div");
+                dateDiv.classList = "secondary-text card-title";
+                var forecastDate = moment.utc(forecastResponse.daily[i].dt * 1000).format("dddd, MMM DD");
+                dateDiv.innerHTML = "<h5 class='font-weight-bold'>" + forecastDate + "</h5>";
+                forecastEl.appendChild(dateDiv);
+                // weather icon
+                var iconDiv = document.createElement("div");
+                iconDiv.innerHTML = "<img src='http://openweathermap.org/img/w/" + forecastResponse.daily[i].weather[0].icon + ".png' class='forecast-icon' alt=Current weather icon/>";
+                forecastEl.appendChild(iconDiv);
+                // display day temperature forecast
+                var tempDiv = document.createElement("div");
+                tempDiv.classList = "card-text secondary-text";
+                "<h6>Night Temp:<span class='font-weight-bold'>" + " " + forecastResponse.daily[i].temp.night + " &#176F</span></h6>";
+                tempDiv.innerHTML = "<h6>Day Temp:<span>" + " " + Math.round(forecastResponse.daily[i].temp.day) + "&#176F</span></h6>" + "<h6>Night Temp:<span>" + " " + Math.round(forecastResponse.daily[i].temp.night) + " &#176F</span></h6>";
+                forecastEl.appendChild(tempDiv);
+
+                // display humidity forecast
+                var humidDiv = document.createElement("div");
+                humidDiv.classList = "card-text secondary-text";
+                humidDiv.innerHTML = "<h6>Humidity:<span>" + " " + forecastResponse.daily[i].humidity + "%</span></h6>";
+                forecastEl.appendChild(humidDiv);
+            }
+        })
         .catch(function (error) {
             removePrevious();
             alert(error.message);
