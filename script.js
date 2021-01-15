@@ -3,27 +3,30 @@ var searchHandler = document.querySelector("#search-form");
 var searchBar = document.querySelector("#search-bar");
 var responseContainer = document.querySelector("#current-result");
 var deleteBtn = document.getElementById("dlt-btn");
-// Current temperature variables
-var cityNameEl = document.createElement("span");
-var currentTempEl = document.createElement("span");
-var humidityEl = document.createElement("span");
-var windEl = document.createElement("span");
+
+// Current temp variables
+const cityTempDiv = document.createElement('div');
+const cityDetailsDiv = document.createElement('div');
+var cityNameEl = document.createElement("div");
+var currentTempEl = document.createElement("div");
+var humidityEl = document.createElement("div");
+var windEl = document.createElement("div");
 var uvIndexContainer = document.createElement("div");
 var uvIndexEl = document.createElement("h4");
-var uvValueDisplay = document.createElement("span");
+var uvValueDisplay = document.createElement("div");
+
 // 5 day forecast variables
 var forecastContainer = document.querySelector("#forecast-result");
 var searchWrapperEl = document.querySelector("#search-wrapper");
 var searchHistoryDiv = document.querySelector("#search-history");
 var cityCount = 1;
-// var citiesArray = [cityOne, cityTwo, cityThree, cityFour, cityFive]
 
 // function to fetch weather api - city is received from searchEvent function as searchValue 
 var weatherRequest = function (city) {
     if (!city) {
         return;
     };
-    var weatherApi = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=imperial&appid=c83c5006fffeb4aa44a34ffd6a27f135";
+    var weatherApi = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=imperial&appid=f56e4b8eacf895c7c1ac2229f45adcdd";
     // fetch the response
     fetch(weatherApi)
         .then(function (response) {
@@ -33,30 +36,35 @@ var weatherRequest = function (city) {
             return response.json();
         })
         .then(function (response) {
-            // log the fetch response
-            console.log(response);
+            // div to contain city name and current temp
+            cityTempDiv.classList = 'temp-div';
+            responseContainer.appendChild(cityTempDiv);
 
-            // create element for the city name response   
-            cityNameEl.innerHTML = "<h2 class='secondary-text'>Current Weather for <span class='font-weight-bold'>" + response.name
-                + "</span></h2><br><img class='icon' src='http://openweathermap.org/img/w/" + response.weather[0].icon
+            // div to contain humidity, wind speed, UV index
+            cityDetailsDiv.classList = 'detail-div';
+            responseContainer.appendChild(cityDetailsDiv);
+
+            // create element for the city name
+            cityNameEl.innerHTML = "<h2 class='secondary-text'> <span class='font-weight-bold style='text-align: center'>" + response.name
+                + " </span></h2><br><img class='icon' src='http://openweathermap.org/img/w/" + response.weather[0].icon
                 + ".png' alt=Current weather icon/><br><br><h2 class='font-weight-bold secondary-text'>" + date + "</h2><br>";
-            responseContainer.appendChild(cityNameEl);
+            cityTempDiv.appendChild(cityNameEl);
 
-            // create element to display the current temperature
+            // create element to display current temp
             currentTempEl.innerHTML = "<h3 class='secondary-text'>Current Temperature:<span class='font-weight-bold'>" + " " + Math.round(response.main.temp) + "&#176F</span></h3><br>";
-            responseContainer.appendChild(currentTempEl);
+            cityTempDiv.appendChild(currentTempEl);
 
             // create element to display humidity
-            humidityEl.innerHTML = "<h4 class='secondary-text'>Humidity:<span class='font-weight-bold'>" + " " + response.main.humidity + "%</span></h4><br>";
-            responseContainer.appendChild(humidityEl);
+            humidityEl.innerHTML = "<h4 class='secondary-text'>Humidity:<span class='font-weight-bold'>" + " " + response.main.humidity + "%</span></h4>";
+            cityDetailsDiv.appendChild(humidityEl);
 
             // create element to display wind speed
             windEl.innerHTML = "<h4 class='secondary-text'>Wind Speed:<span class='font-weight-bold'>" + " " + Math.round(response.wind.speed) + " MPH</span></h4>";
-            responseContainer.appendChild(windEl);
+            cityDetailsDiv.appendChild(windEl);
 
 
             // fetch UV Index
-            return fetch("https://api.openweathermap.org/data/2.5/uvi?appid=c83c5006fffeb4aa44a34ffd6a27f135&lat=" + response.coord.lat + "&lon=" + response.coord.lon);
+            return fetch("https://api.openweathermap.org/data/2.5/uvi?appid=f56e4b8eacf895c7c1ac2229f45adcdd&lat=" + response.coord.lat + "&lon=" + response.coord.lon);
         })
         .then(function (uvFetch) {
             return uvFetch.json();
@@ -64,15 +72,18 @@ var weatherRequest = function (city) {
         .then(function (uvResponse) {
             // create div to contain UV index
             uvIndexContainer.setAttribute("id", "uv-value");
-            uvIndexContainer.classList = "secondary-text card-body uv-class";
-            responseContainer.appendChild(uvIndexContainer);
+            uvIndexContainer.classList = "secondary-text uv-class";
+            cityDetailsDiv.appendChild(uvIndexContainer);
+
             // set uvValue
             var uvValue = uvResponse.value;
             uvIndexEl.innerHTML = "UV Index: ";
+
             uvValueDisplay.setAttribute("id", "uv-index");
             uvValueDisplay.innerHTML = uvValue;
             uvIndexContainer.appendChild(uvIndexEl);
             uvIndexContainer.appendChild(uvValueDisplay);
+
             if (uvResponse.value > 7) {
                 document.querySelector("#uv-index").classList = "uv-result rounded bg-danger";
             } else if (uvResponse.value >= 2 && uvResponse.value <= 7) {
@@ -80,7 +91,8 @@ var weatherRequest = function (city) {
             } else if (uvResponse.value <= 2) {
                 document.querySelector("#uv-index").classList = "uv-result rounded bg-success";
             }
-            return fetch("https://api.openweathermap.org/data/2.5/onecall?lat=" + uvResponse.lat + "&lon=" + uvResponse.lon + "&appid=c83c5006fffeb4aa44a34ffd6a27f135&units=imperial");
+
+            return fetch("https://api.openweathermap.org/data/2.5/onecall?lat=" + uvResponse.lat + "&lon=" + uvResponse.lon + "&appid=f56e4b8eacf895c7c1ac2229f45adcdd&units=imperial");
         })
         .then(function (forecastResponse) {
             return forecastResponse.json();
@@ -98,14 +110,15 @@ var weatherRequest = function (city) {
                 var forecastDate = moment.utc(forecastResponse.daily[i].dt * 1000).format("dddd, MMM DD");
                 dateDiv.innerHTML = "<h5 class='font-weight-bold'>" + forecastDate + "</h5>";
                 forecastEl.appendChild(dateDiv);
-                // weather icon
+
+                // conditions icon
                 var iconDiv = document.createElement("div");
                 iconDiv.innerHTML = "<img src='http://openweathermap.org/img/w/" + forecastResponse.daily[i].weather[0].icon + ".png' class='forecast-icon' alt=Current weather icon/>";
                 forecastEl.appendChild(iconDiv);
+
                 // display day temperature forecast
                 var tempDiv = document.createElement("div");
                 tempDiv.classList = "card-text secondary-text";
-                "<h6>Night Temp:<span class='font-weight-bold'>" + " " + forecastResponse.daily[i].temp.night + " &#176F</span></h6>";
                 tempDiv.innerHTML = "<h6>Day Temp:<span>" + " " + Math.round(forecastResponse.daily[i].temp.day) + "&#176F</span></h6>" + "<h6>Night Temp:<span>" + " " + Math.round(forecastResponse.daily[i].temp.night) + " &#176F</span></h6>";
                 forecastEl.appendChild(tempDiv);
 
@@ -126,19 +139,19 @@ var weatherRequest = function (city) {
 
 var searchEvent = function (event) {
     event.preventDefault();
+    
     // clicking search button submits value and calls weatherRequest function
     var searchValue = searchBar.value.trim().toUpperCase();
 
     if (searchValue) {
-        // Correct way to implement is to catch any errors happening from weatherRequest and skip createBtn/storeHistory
         weatherRequest(searchValue);
         createBtn(searchValue);
         storeHistory();
-        // document.querySelector("#search-bar").value = "";
+
     } else {
 
-        //if search is empty, throw an alert. CHANGE TO A MODAL LATER
-        alert("Please enter a city to see its current weather.");
+        //if search is empty, alert user
+        alert("Please enter a city name!");
     };
 };
 
@@ -151,7 +164,10 @@ function createBtn(city) {
     citySearch.setAttribute("type", "submit");
     citySearch.setAttribute("id", "city-" + city);
     searchHistoryDiv.prepend(citySearch);
+
 };
+
+
 
 function clearHistory() {
     var searchedCities = JSON.parse(localStorage.getItem("searchedCities"));
@@ -163,7 +179,6 @@ function clearHistory() {
 
 function storeHistory() {
     // variables to store storage keys for if statements
-
     var userSearch = document.querySelector("#search-bar").value.trim().toUpperCase();
 
     if (!userSearch) {
@@ -172,29 +187,23 @@ function storeHistory() {
 
     var previousSearchCity = JSON.parse(localStorage.getItem("searchedCities")) || [];
     previousSearchCity.push(userSearch);
-
     localStorage.setItem("searchedCities", JSON.stringify(previousSearchCity));
 
     // clear search bar after clicking search button
     document.querySelector("#search-bar").value = "";
+
     // call function to remove previously searched weather
-    removePrevious();
+    // removePrevious();
 };
 
 function loadHistory() {
     if (localStorage.getItem("searchedCities")) {
-
         var previousSearchCity = JSON.parse(localStorage.getItem("searchedCities"));
-
         for (var i = 0; i < previousSearchCity.length; i++) {
-
             createBtn(previousSearchCity[i]);
         }
-
-        localStorage.setItem("searchedCities", JSON.stringify(previousSearchCity));
     };
-
-
+        
     for (i = 0; i < document.getElementsByClassName("btn").length; i++) {
         document.getElementsByClassName("btn")[i].addEventListener('click', function () {
             var btnClicked = this.getAttribute("data-city");
@@ -213,9 +222,10 @@ var removePrevious = function () {
     currentTempEl.remove();
     humidityEl.remove();
     windEl.remove();
+
 };
 
 searchHandler.addEventListener("submit", searchEvent);
 deleteBtn.addEventListener("click", clearHistory);
 
-loadHistory(); 
+loadHistory();
